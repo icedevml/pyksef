@@ -1,2 +1,0 @@
-requests==2.32.5
-signxml==4.2.2

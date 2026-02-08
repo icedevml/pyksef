@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyksef"
+version = "0.1.0"
+description = "KSeF Authentication library"
+readme = "README.md"
+authors = [
+    {name = "Michał Leszczyński", email = "ml@icedev.pl"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "requests>=2.32.5",
+    "signxml>=4.2.2",
+    "python-pkcs11>=0.9.3"
+]
+
+[project.scripts]
+ksef_auth_file = "pyksef.cli.ksef_auth_file:cli"
+ksef_auth_pkcs11 = "pyksef.cli.ksef_auth_pkcs11:cli"
+p11_list_objects = "pyksef.cli.p11_list_objects:cli"
+p11_list_tokens = "pyksef.cli.p11_list_tokens:cli"
+
+[project.urls]
+Homepage = "https://github.com/icedevml/python-ksef-xades-auth"
+Repository = "https://github.com/icedevml/python-ksef-xades-auth"
+Issues = "https://github.com/icedevml/python-ksef-xades-auth/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
