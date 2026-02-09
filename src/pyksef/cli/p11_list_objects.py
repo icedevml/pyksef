@@ -2,9 +2,8 @@ import argparse
 import binascii
 import getpass
 
-from cryptography.hazmat.primitives._serialization import Encoding
-
 from pyksef.p11 import PKCS11Lib
+from pyksef.x509 import Encoding
 
 
 def p11_list_certificates(pkcs11_dll_path: str, token_label: str, token_serial: bytes, user_pin: str):

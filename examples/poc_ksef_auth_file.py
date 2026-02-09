@@ -1,6 +1,5 @@
-from cryptography.x509 import load_pem_x509_certificate
-
 from pyksef import ksef_auth_xades, PEMPrivateKey, SubjectIdentifierType
+from pyksef.x509 import load_pem_x509_certificate
 
 PROD_API_BASE_URL = "https://api.ksef.mf.gov.pl/v2"
 

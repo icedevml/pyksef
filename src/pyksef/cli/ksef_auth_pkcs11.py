@@ -3,11 +3,9 @@ import binascii
 import getpass
 import json
 
-from cryptography.x509 import load_pem_x509_certificate
-from pkcs11 import Certificate
-
 from pyksef import ksef_auth_xades, SubjectIdentifierType
 from pyksef.p11 import create_p11_private_key, PKCS11Lib, get_leaf_certificate
+from pyksef.x509 import Certificate, load_pem_x509_certificate
 
 
 def ksef_auth_pkcs11(

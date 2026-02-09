@@ -1,9 +1,8 @@
 import argparse
 import json
 
-from cryptography.x509 import load_pem_x509_certificate, Certificate
-
 from pyksef import ksef_auth_xades, SubjectIdentifierType, PEMPrivateKey
+from pyksef.x509 import load_pem_x509_certificate, Certificate
 
 
 def ksef_auth_file(
