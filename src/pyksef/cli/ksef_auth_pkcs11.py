@@ -95,7 +95,7 @@ def cli():
         cert=cert,
         api_base_url=args.api_base_url,
         context_id=context_id,
-        subject_id_type=args.subject_id_type
+        subject_id_type=SubjectIdentifierType[args.subject_id_type]
     )
 
 
