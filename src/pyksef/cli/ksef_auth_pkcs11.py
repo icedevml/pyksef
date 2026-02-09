@@ -5,6 +5,7 @@ import json
 
 from pyksef import ksef_auth_xades
 from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
+from pyksef.auth.state import ksef_poll_auth_finalized
 from pyksef.p11 import create_p11_private_key, PKCS11Lib, get_leaf_certificate
 from pyksef.x509 import Certificate, load_pem_x509_certificate
 
@@ -29,15 +30,13 @@ def ksef_auth_pkcs11(
     if not cert:
         cert = get_leaf_certificate(o.x509_cert for o in lib.get_certificates())
 
-    res = ksef_auth_xades(
+    return ksef_auth_xades(
         api_base_url=api_base_url,
         cert=cert,
         key=create_p11_private_key(lib, cert),
         context_id=context_id,
         subject_id_type=subject_id_type,
     )
-
-    print(json.dumps(res))
 
 
 def cli():
@@ -85,7 +84,7 @@ def cli():
         with open(args.cert_file, "rb") as f:
             cert = load_pem_x509_certificate(f.read())
 
-    ksef_auth_pkcs11(
+    auth_res = ksef_auth_pkcs11(
         pkcs11_dll=args.pkcs11_dll,
         token_label=args.token_label,
         token_serial=token_serial,
@@ -97,6 +96,17 @@ def cli():
         context_id=context_id,
         subject_id_type=SubjectIdentifierType[args.subject_id_type]
     )
+
+    auth_state = ksef_poll_auth_finalized(
+        api_base_url=args.api_base_url,
+        reference_number=auth_res["referenceNumber"],
+        authentication_token=auth_res["authenticationToken"]["token"]
+    )
+
+    print(json.dumps({
+        "ksefAuthPKCS11Result": auth_res,
+        "ksefPollAuthFinalizedResult": auth_state,
+    }, indent=4))
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ import json
 from pyksef import ksef_auth_xades
 from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
 from pyksef.auth.local_key import PEMPrivateKey
+from pyksef.auth.state import ksef_poll_auth_finalized
 from pyksef.x509 import load_pem_x509_certificate, Certificate
 
 
@@ -18,15 +19,13 @@ def ksef_auth_file(
         subject_id_type: SubjectIdentifierType):
     key = PEMPrivateKey(key_pem, key_passphrase)
 
-    res = ksef_auth_xades(
+    return ksef_auth_xades(
         api_base_url=api_base_url,
         cert=cert,
         key=key,
         context_id=context_id,
         subject_id_type=subject_id_type,
     )
-
-    print(json.dumps(res))
 
 
 def cli():
@@ -67,7 +66,7 @@ def cli():
         if entered_pass:
             key_passphrase = entered_pass.encode("utf-8")
 
-    ksef_auth_file(
+    auth_res = ksef_auth_file(
         cert=cert,
         key_pem=key_pem,
         key_passphrase=key_passphrase,
@@ -75,6 +74,17 @@ def cli():
         context_id=context_id,
         subject_id_type=SubjectIdentifierType[args.subject_id_type]
     )
+
+    auth_state = ksef_poll_auth_finalized(
+        api_base_url=args.api_base_url,
+        reference_number=auth_res["referenceNumber"],
+        authentication_token=auth_res["authenticationToken"]["token"]
+    )
+
+    print(json.dumps({
+        "ksefAuthFileResult": auth_res,
+        "ksefPollAuthFinalizedResult": auth_state,
+    }, indent=4))
 
 
 if __name__ == "__main__":

@@ -148,6 +148,7 @@ import json
 
 from pyksef import ksef_auth_xades
 from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
+from pyksef.auth.state import ksef_poll_auth_finalized
 from pyksef.p11 import create_p11_private_key, PKCS11Lib, get_leaf_certificate
 from pyksef.x509 import load_pem_x509_certificate
 
@@ -180,7 +181,8 @@ cert = get_leaf_certificate(o.x509_cert for o in lib.get_certificates())
 #     cert = load_pem_x509_certificate(cert_pem_bytes)
 # ---
 
-res = ksef_auth_xades(
+# perform KSeF authentication using PKCS#11 private key
+auth_res = ksef_auth_xades(
   api_base_url=PROD_API_BASE_URL,
   cert=cert,
   key=create_p11_private_key(lib, cert),
@@ -188,11 +190,50 @@ res = ksef_auth_xades(
   subject_id_type=SUBJECT_ID_TYPE,
 )
 
-print(json.dumps(res))
+# poll authentication state and redeem the actual token
+auth_state = ksef_poll_auth_finalized(
+    api_base_url=PROD_API_BASE_URL,
+    reference_number=auth_res["referenceNumber"],
+    authentication_token=auth_res["authenticationToken"]["token"]
+)
+
+print(json.dumps({
+    "ksefAuthPKCS11Result": auth_res,
+    "ksefPollAuthFinalizedResult": auth_state,
+}, indent=4))
 ```
 Example output:
 ```json
-{"referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX", "authenticationToken": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "validUntil": "2026-02-04T15:20:15.6254824+00:00"}}
+{
+    "ksefAuthPKCS11Result": {
+        "referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX",
+        "authenticationToken": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "validUntil": "2026-02-09T16:08:59.2602376+00:00"
+        }
+    },
+    "ksefPollAuthFinalizedResult": {
+        "redeemResult": {
+            "accessToken": {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                "validUntil": "2026-02-09T15:38:58.1201962+00:00"
+            },
+            "refreshToken": {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                "validUntil": "2026-02-16T15:23:58.1201962+00:00"
+            }
+        },
+        "authState": {
+            "startDate": "2026-02-09T15:23:58.1401992+00:00",
+            "authenticationMethod": "QualifiedSignature",
+            "status": {
+                "code": 200,
+                "description": "Uwierzytelnianie zako\u0144czone sukcesem"
+            },
+            "isTokenRedeemed": false
+        }
+    }
+}
 ```
 
 ### Authentication with private key on local disk
@@ -202,8 +243,9 @@ import getpass
 import json
 
 from pyksef import ksef_auth_xades
-from pyksef.auth.local_key import PEMPrivateKey
 from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
+from pyksef.auth.local_key import PEMPrivateKey
+from pyksef.auth.state import ksef_poll_auth_finalized
 from pyksef.x509 import load_pem_x509_certificate
 
 
@@ -232,8 +274,8 @@ with open(PEM_KEY_FILENAME, 'rb') as f:
 # construct PEMPrivateKey object with file contents and passphrase to decrypt the key
 key = PEMPrivateKey(key_pem, PEM_PASSPHRASE.encode("utf-8"))
 
-# perform KSeF authentication
-res = ksef_auth_xades(
+# perform KSeF authentication with PEM certificate/key file
+auth_res = ksef_auth_xades(
     api_base_url=PROD_API_BASE_URL,
     cert=cert,
     key=key,
@@ -241,11 +283,50 @@ res = ksef_auth_xades(
     subject_id_type=SUBJECT_ID_TYPE,
 )
 
-print(json.dumps(res))
+# poll authentication state and redeem the actual token
+auth_state = ksef_poll_auth_finalized(
+    api_base_url=PROD_API_BASE_URL,
+    reference_number=auth_res["referenceNumber"],
+    authentication_token=auth_res["authenticationToken"]["token"]
+)
+
+print(json.dumps({
+    "ksefAuthFileResult": auth_res,
+    "ksefPollAuthFinalizedResult": auth_state,
+}, indent=4))
 ```
 Example output:
 ```json
-{"referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX", "authenticationToken": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "validUntil": "2026-02-04T15:20:15.6254824+00:00"}}
+{
+    "ksefAuthPKCS11Result": {
+        "referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX",
+        "authenticationToken": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "validUntil": "2026-02-09T16:08:59.2602376+00:00"
+        }
+    },
+    "ksefPollAuthFinalizedResult": {
+        "redeemResult": {
+            "accessToken": {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                "validUntil": "2026-02-09T15:38:58.1201962+00:00"
+            },
+            "refreshToken": {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                "validUntil": "2026-02-16T15:23:58.1201962+00:00"
+            }
+        },
+        "authState": {
+            "startDate": "2026-02-09T15:23:58.1401992+00:00",
+            "authenticationMethod": "QualifiedSignature",
+            "status": {
+                "code": 200,
+                "description": "Uwierzytelnianie zako\u0144czone sukcesem"
+            },
+            "isTokenRedeemed": false
+        }
+    }
+}
 ```
 
 ## Troubleshooting
