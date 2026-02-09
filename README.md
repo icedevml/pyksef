@@ -28,7 +28,7 @@ Command:
 p11_list_tokens \
     --pkcs11-dll "C:\Program Files\Krajowa Izba Rozliczeniowa S.A\Szafir 2.0\bin\CCGraphiteP11p.x64.dll"
 ```
-Output:
+Example output:
 ```
 TokenRecord(slot=<Slot (slotID=2 flags=7)>, label='PKI Token 1 (Primary)', serial='31333132303030313233343536373839', manufacturer_id='CryptoTech P.S.A.', model='CCGraphitePro', hardware_version=(0, 0), firmware_version=(0, 0), flags=<TokenFlag.LOGIN_REQUIRED|USER_PIN_INITIALIZED|TOKEN_INITIALIZED: 1036>)
 TokenRecord(slot=<Slot (slotID=3 flags=7)>, label='PKI Token 2 (QSCD)', serial='31333132303030313233343536373839', manufacturer_id='CryptoTech P.S.A.', model='CCGraphitePro', hardware_version=(0, 0), firmware_version=(0, 0), flags=<TokenFlag.WRITE_PROTECTED|LOGIN_REQUIRED|USER_PIN_INITIALIZED|TOKEN_INITIALIZED: 1038>)
@@ -43,7 +43,7 @@ p11_list_objects \
     --token-serial "31333132303030313233343536373839" \
     --user-pin 123456                                                                                                                                                                                                     
 ```
-Output:
+Example output:
 ```
 CertificateRecord(x509_cert=<Certificate(subject=<Name(C=PL,2.5.4.5=PNOPL-12345678900,CN=Jan Kowalski,2.5.4.42=Jan,2.5.4.4=Kowalski)>, ...)>)
 PrivateKeyRecord(label='No Friendly Name Available', id='6572df736d642974a2bab6ddba753aefb89afcce', key_type=<KeyType.RSA>)
@@ -59,7 +59,7 @@ p11_list_objects \
     --user-pin 123456 \
     --output certificates
 ```
-Output:
+Example output:
 ```
 -----BEGIN CERTIFICATE-----
 MIIHe...
@@ -77,7 +77,7 @@ ksef_auth_pkcs11 \
     --context-id-type nip \
     --context-id 5421234567
 ```
-Output:
+Example output:
 ```json
 {"referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX", "authenticationToken": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "validUntil": "2026-02-04T15:20:15.6254824+00:00"}}
 ```
@@ -92,33 +92,90 @@ ksef_auth_file \
     --context-id-type nip \
     --context-id 5421234567
 ```
-Output:
+Example output:
 ```json
 {"referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX", "authenticationToken": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "validUntil": "2026-02-04T15:20:15.6254824+00:00"}}
 ```
 
 ## Usage via Python
 
+### PKCS#11 List tokens available with certain provider
+
+```python
+from pyksef.p11 import PKCS11Lib
+
+# load PKCS#11 library for CryptoCard Graphite (note that any qualified signature/seal issuer is supported)
+PKCS11_DLL_PATH = "C:\\Program Files\\Krajowa Izba Rozliczeniowa S.A\\Szafir 2.0\\bin\\CCGraphiteP11p.x64.dll"
+
+lib = PKCS11Lib(PKCS11_DLL_PATH)
+for token in lib.get_tokens():
+    print(token)
+```
+
+Example output:
+```
+TokenRecord(slot=<Slot (slotID=2 flags=7)>, label='PKI Token 1 (Primary)', serial='31333132303030313233343536373839', manufacturer_id='CryptoTech P.S.A.', model='CCGraphitePro', hardware_version=(0, 0), firmware_version=(0, 0), flags=<TokenFlag.LOGIN_REQUIRED|USER_PIN_INITIALIZED|TOKEN_INITIALIZED: 1036>)
+TokenRecord(slot=<Slot (slotID=3 flags=7)>, label='PKI Token 2 (QSCD)', serial='31333132303030313233343536373839', manufacturer_id='CryptoTech P.S.A.', model='CCGraphitePro', hardware_version=(0, 0), firmware_version=(0, 0), flags=<TokenFlag.WRITE_PROTECTED|LOGIN_REQUIRED|USER_PIN_INITIALIZED|TOKEN_INITIALIZED: 1038>)
+```
+
+### PKCS#11 List private keys/certificates available with certain token
+
+```python
+import getpass
+
+from pyksef.p11 import PKCS11Lib
+
+PKCS11_DLL_PATH = "C:\\Program Files\\Krajowa Izba Rozliczeniowa S.A\\Szafir 2.0\\bin\\CCGraphiteP11p.x64.dll"
+TOKEN_LABEL = "PKI Token 2 (QSCD)"
+USER_PIN = getpass.getpass("User PIN: ")
+
+lib = PKCS11Lib(PKCS11_DLL_PATH)
+lib.set_token(token_label=TOKEN_LABEL, user_pin=USER_PIN)
+
+for certificate in lib.get_certificates():
+    print(certificate)
+
+for private_key in lib.get_private_keys():
+    print(private_key)
+```
+
+Example output:
+```
+CertificateRecord(x509_cert=<Certificate(subject=<Name(C=PL,2.5.4.5=PNOPL-12345678900,CN=Jan Kowalski,2.5.4.42=Jan,2.5.4.4=Kowalski)>, ...)>)
+PrivateKeyRecord(label='No Friendly Name Available', id='6572df736d642974a2bab6ddba753aefb89afcce', key_type=<KeyType.RSA>)
+```
+
 ### PKCS#11 Authentication
 
 ```python
 import binascii
+import getpass
+import json
 
 from pyksef import ksef_auth_xades
 from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
 from pyksef.p11 import create_p11_private_key, PKCS11Lib, get_leaf_certificate
 from pyksef.x509 import load_pem_x509_certificate
 
+
+# PKCS#11 Token parameters
+PKCS11_DLL_PATH = "C:\\Program Files\\Krajowa Izba Rozliczeniowa S.A\\Szafir 2.0\\bin\\CCGraphiteP11p.x64.dll"
+TOKEN_LABEL = "PKI Token 2 (QSCD)"
+USER_PIN = getpass.getpass("User PIN: ")
+PRIVATE_KEY_ID = "6572df736d642974a2bab6ddba753aefb89afcce"
+
+# Authentication parameters
+CONTEXT_ID = ContextIdentifier(type=ContextIdentifierType.nip, value="5421234567")
+SUBJECT_ID_TYPE = SubjectIdentifierType.certificateSubject
+
+# API URL
 PROD_API_BASE_URL = "https://api.ksef.mf.gov.pl/v2"
 
-# load PKCS#11 library for CryptoCard Graphite (note that any qualified signature/seal issuer is supported)
-lib = PKCS11Lib("C:\\Program Files\\Krajowa Izba Rozliczeniowa S.A\\Szafir 2.0\\bin\\CCGraphiteP11p.x64.dll")
-# set token label and PIN; if you don't know your token_label, check it using cli_p11_list_tokens.py tool
-# or invoke `lib.get_tokens()` programmatically
-lib.set_token(token_label="PKI Token 2 (QSCD)", user_pin="123456")
-# set private key ID; if you don't know your key_id, check it using cli_p11_list_objects.py tool
-# or invoke `lib.get_private_keys()` programmatically
-lib.set_private_key(key_id=binascii.unhexlify("6572df736d642974a2bab6ddba753aefb89afcce"))
+# ---
+
+lib = PKCS11Lib(PKCS11_DLL_PATH)
+lib.set_token(token_label=TOKEN_LABEL, user_pin=USER_PIN)
+lib.set_private_key(key_id=binascii.unhexlify(PRIVATE_KEY_ID))
 
 # download the signer's certificate from the signer device directly
 cert = get_leaf_certificate(o.x509_cert for o in lib.get_certificates())
@@ -133,42 +190,76 @@ res = ksef_auth_xades(
   api_base_url=PROD_API_BASE_URL,
   cert=cert,
   key=create_p11_private_key(lib, cert),
-  context_id=ContextIdentifier(type=ContextIdentifierType.nip, value="5421234567"),
-  subject_id_type=SubjectIdentifierType.certificateSubject
+  context_id=CONTEXT_ID,
+  subject_id_type=SUBJECT_ID_TYPE,
 )
 
-print(res)
+print(json.dumps(res))
+```
+Example output:
+```json
+{"referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX", "authenticationToken": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "validUntil": "2026-02-04T15:20:15.6254824+00:00"}}
 ```
 
 ### Authentication with private key on local disk
 
 ```python
+import getpass
+import json
+
 from pyksef import ksef_auth_xades
 from pyksef.auth.local_key import PEMPrivateKey
 from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
 from pyksef.x509 import load_pem_x509_certificate
 
+
+# Certificate/key file parameters
+PEM_CERT_FILENAME = "_private/ksef.crt"
+PEM_KEY_FILENAME = "_private/ksef.key"
+PEM_PASSPHRASE = getpass.getpass("PEM Passphrase: ")
+
+# Authentication parameters
+CONTEXT_ID = ContextIdentifier(type=ContextIdentifierType.nip, value="5421234567")
+SUBJECT_ID_TYPE = SubjectIdentifierType.certificateSubject
+
+# API URL
 PROD_API_BASE_URL = "https://api.ksef.mf.gov.pl/v2"
 
+# ---
+
 # load X.509 certificate from file
-with open('_private/ksef.crt', 'rb') as f:
+with open(PEM_CERT_FILENAME, 'rb') as f:
     cert = load_pem_x509_certificate(f.read())
 
 # load X.509 key from file
-with open('_private/ksef.key', 'rb') as f:
+with open(PEM_KEY_FILENAME, 'rb') as f:
     key_pem = f.read()
 
 # construct PEMPrivateKey object with file contents and passphrase to decrypt the key
-key = PEMPrivateKey(key_pem, b"MyPassword54321!!")
+key = PEMPrivateKey(key_pem, PEM_PASSPHRASE.encode("utf-8"))
 
 # perform KSeF authentication
 res = ksef_auth_xades(
     api_base_url=PROD_API_BASE_URL,
     cert=cert,
     key=key,
-    context_id=ContextIdentifier(type=ContextIdentifierType.nip, value="5421234567"),
-    subject_id_type=SubjectIdentifierType.certificateSubject
+    context_id=CONTEXT_ID,
+    subject_id_type=SUBJECT_ID_TYPE,
 )
 
-print(res)
+print(json.dumps(res))
 ```
+Example output:
+```json
+{"referenceNumber": "XXXXXXXX-XX-XXXXXXXXXX-XXXXXXXXXX-XX", "authenticationToken": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "validUntil": "2026-02-04T15:20:15.6254824+00:00"}}
+```
+
+## Troubleshooting
+
+If you see the following exception even though the DLL physically exists at the path indicated:
+
+```
+pkcs11.exceptions.PKCS11Error: OS exception while loading <file path>.dll: The specified module could not be found.
+```
+
+please check if your `PATH` environment variable is set correctly. Your PKCS#11 DLL might depend on some auxiliary DLLs that are unavailable.
