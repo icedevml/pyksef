@@ -7,11 +7,11 @@ Supported features:
   * KSeF Certificate hosted on a HSM (e.g. YubiHSM, YubiKey, Google Cloud KMS).
 * Authentication using certificate and private key stored as PEM files on local hard disk.
 
-## CLI Usage
-
 ```commandline
 pip3 install pyksef
 ```
+
+## CLI Usage
 
 ### List available PKCS#11 tokens
 Command:
@@ -130,9 +130,8 @@ print(res)
 ### Authentication with private key on local disk
 
 ```python
-from cryptography.x509 import load_pem_x509_certificate
-
 from pyksef import ksef_auth_xades, PEMPrivateKey, SubjectIdentifierType
+from pyksef.x509 import load_pem_x509_certificate
 
 PROD_API_BASE_URL = "https://api.ksef.mf.gov.pl/v2"
 
