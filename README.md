@@ -38,8 +38,7 @@ Command:
 p11_list_objects \
     --pkcs11-dll "C:\Program Files\Krajowa Izba Rozliczeniowa S.A\Szafir 2.0\bin\CCGraphiteP11p.x64.dll" \
     --token-label "PKI Token 2 (QSCD)" \
-    --token-serial "31333132303030313233343536373839" \
-    --user-pin 123456                                                                                                                                                                                                     
+    --token-serial "31333132303030313233343536373839"
 ```
 Example output:
 ```
@@ -54,7 +53,6 @@ p11_list_objects \
     --pkcs11-dll "C:\Program Files\Krajowa Izba Rozliczeniowa S.A\Szafir 2.0\bin\CCGraphiteP11p.x64.dll" \
     --token-label "PKI Token 2 (QSCD)" \
     --token-serial "31333132303030313233343536373839" \
-    --user-pin 123456 \
     --output certificates
 ```
 Example output:
@@ -71,7 +69,6 @@ ksef_auth_pkcs11 \
     --pkcs11-dll "C:\Program Files\Krajowa Izba Rozliczeniowa S.A\Szafir 2.0\bin\CCGraphiteP11p.x64.dll" \
     --token-label "PKI Token 2 (QSCD)" \
     --key-id 6572df736d642974a2bab6ddba753aefb89afcce \
-    --user-pin 123456 \
     --context-id-type nip \
     --context-id 5421234567
 ```
@@ -86,7 +83,6 @@ Command:
 ksef_auth_file \
     --cert-file ksef.crt \
     --key-file ksf.key \
-    --key-passphrase "MyPassword54321!!" \
     --context-id-type nip \
     --context-id 5421234567
 ```

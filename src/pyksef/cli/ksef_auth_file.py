@@ -1,4 +1,5 @@
 import argparse
+import getpass
 import json
 
 from pyksef import ksef_auth_xades
@@ -33,7 +34,9 @@ def cli():
 
     parser.add_argument("--cert-file", required=True, help="Path to the X509 certificate file (PEM).")
     parser.add_argument("--key-file", required=True, help="Path to the key file (PEM).")
-    parser.add_argument("--key-passphrase", help="Passphrase to decrypt the key file.")
+    parser.add_argument("--key-passphrase",
+                        help="Optional: Passphrase to decrypt the key file. You will be interactively prompted for "
+                             "a passphrase if this argument is not provided.")
     parser.add_argument("--api-base-url", default="https://api.ksef.mf.gov.pl/v2",
                         help="KSeF API base url. Default: https://api.ksef.mf.gov.pl/v2")
     parser.add_argument("--context-id-type", default="nip",
@@ -58,6 +61,11 @@ def cli():
 
     if args.key_passphrase:
         key_passphrase = args.key_passphrase.encode("utf-8")
+    else:
+        entered_pass = getpass.getpass("PEM Passphrase: ")
+
+        if entered_pass:
+            key_passphrase = entered_pass.encode("utf-8")
 
     ksef_auth_file(
         cert=cert,
