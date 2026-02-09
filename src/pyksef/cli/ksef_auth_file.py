@@ -82,7 +82,7 @@ def cli():
     )
 
     print(json.dumps({
-        "ksefAuthFileResult": auth_res,
+        "ksefAuthInitResult": auth_res,
         "ksefPollAuthFinalizedResult": auth_state,
     }, indent=4))
 

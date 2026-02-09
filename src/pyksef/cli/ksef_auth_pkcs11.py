@@ -104,7 +104,7 @@ def cli():
     )
 
     print(json.dumps({
-        "ksefAuthPKCS11Result": auth_res,
+        "ksefAuthInitResult": auth_res,
         "ksefPollAuthFinalizedResult": auth_state,
     }, indent=4))
 
