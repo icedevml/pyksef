@@ -2,13 +2,12 @@
 This code portion was inspired by https://github.com/reaperhulk/vault-signing
 Original license BSD-3-Clause (author: @reaperhulk)
 """
-from cryptography.x509 import Certificate
-
 from cryptography import utils
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurveSignatureAlgorithm, EllipticCurve, ECDH, \
     EllipticCurvePublicKey, EllipticCurvePrivateKey, EllipticCurvePrivateNumbers
+from cryptography.x509 import Certificate
 
 from pyksef.p11._alg_mapping import map_p11_mechanism
 from pyksef.p11._lib_wrapper import PKCS11Lib

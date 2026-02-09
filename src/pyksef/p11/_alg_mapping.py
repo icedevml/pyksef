@@ -20,6 +20,7 @@ _MAPPING = [
     (padding.PKCS1v15, hashes.SHA512, Mechanism.SHA512_RSA_PKCS, SignatureMethod.RSA_SHA512),
 ]
 
+
 def map_p11_mechanism(x509_cert: Certificate) -> Mechanism:
     cert_sig_alg = x509_cert.signature_algorithm_parameters
     cert_hash_alg = x509_cert.signature_hash_algorithm

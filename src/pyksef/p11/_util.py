@@ -9,6 +9,7 @@ def get_leaf_certificates(certs: Iterable[Certificate]) -> Generator[Certificate
         if not ext.value.ca:
             yield cert
 
+
 def get_leaf_certificate(certs: Iterable[Certificate]) -> Certificate:
     leafs = list(get_leaf_certificates(certs))
 

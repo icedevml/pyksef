@@ -32,7 +32,8 @@ class P11RSAPrivateKey(rsa.RSAPrivateKey):
             raise RuntimeError("The passed p11_lib is not configured. "
                                "Use p11_lib.set_token() and p11_lib.set_private_key() first.")
 
-    def sign(self, data: bytes, padding: AsymmetricPadding, algorithm: typing.Union[asym_utils.Prehashed, hashes.HashAlgorithm]) -> bytes:
+    def sign(self, data: bytes, padding: AsymmetricPadding,
+             algorithm: typing.Union[asym_utils.Prehashed, hashes.HashAlgorithm]) -> bytes:
         if not isinstance(padding, PKCS1v15):
             raise RuntimeError("Unsupported padding type requested.")
 
@@ -60,9 +61,9 @@ class P11RSAPrivateKey(rsa.RSAPrivateKey):
         raise NotImplementedError("Attempted to retrieve private key material (implementation bug?).")
 
     def private_bytes(
-        self,
-        encoding: serialization.Encoding,
-        format: serialization.PrivateFormat,
-        encryption_algorithm: serialization.KeySerializationEncryption,
+            self,
+            encoding: serialization.Encoding,
+            format: serialization.PrivateFormat,
+            encryption_algorithm: serialization.KeySerializationEncryption,
     ) -> bytes:
         raise NotImplementedError("Attempted to retrieve private key material (implementation bug?).")

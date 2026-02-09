@@ -1,3 +1,5 @@
+from pyksef.auth.identifier import ContextIdentifier
+
 # Python KSeF Authentication Library (for PKCS#11 and local private keys)
 
 > [!NOTE]  
@@ -72,7 +74,8 @@ ksef_auth_pkcs11 \
     --token-label "PKI Token 2 (QSCD)" \
     --key-id 6572df736d642974a2bab6ddba753aefb89afcce \
     --user-pin 123456 \
-    --target-nip 5421234567
+    --context-id-type nip \
+    --context-id 5421234567
 ```
 Output:
 ```json
@@ -86,7 +89,8 @@ ksef_auth_file \
     --cert-file ksef.crt \
     --key-file ksf.key \
     --key-passphrase "MyPassword54321!!" \
-    --target-nip 5421234567
+    --context-id-type nip \
+    --context-id 5421234567
 ```
 Output:
 ```json
@@ -100,8 +104,10 @@ Output:
 ```python
 import binascii
 
-from pyksef import ksef_auth_xades, SubjectIdentifierType
-from pyksef.p11 import PKCS11Lib, get_leaf_certificate, create_p11_private_key
+from pyksef import ksef_auth_xades
+from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
+from pyksef.p11 import create_p11_private_key, PKCS11Lib, get_leaf_certificate
+from pyksef.x509 import load_pem_x509_certificate
 
 PROD_API_BASE_URL = "https://api.ksef.mf.gov.pl/v2"
 
@@ -127,8 +133,8 @@ res = ksef_auth_xades(
   api_base_url=PROD_API_BASE_URL,
   cert=cert,
   key=create_p11_private_key(lib, cert),
-  target_nip="5421234567",
-  identifier_type=SubjectIdentifierType.certificateSubject
+  context_id=ContextIdentifier(type=ContextIdentifierType.nip, value="5421234567"),
+  subject_id_type=SubjectIdentifierType.certificateSubject
 )
 
 print(res)
@@ -137,7 +143,9 @@ print(res)
 ### Authentication with private key on local disk
 
 ```python
-from pyksef import ksef_auth_xades, PEMPrivateKey, SubjectIdentifierType
+from pyksef import ksef_auth_xades
+from pyksef.auth.local_key import PEMPrivateKey
+from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
 from pyksef.x509 import load_pem_x509_certificate
 
 PROD_API_BASE_URL = "https://api.ksef.mf.gov.pl/v2"
@@ -158,8 +166,8 @@ res = ksef_auth_xades(
     api_base_url=PROD_API_BASE_URL,
     cert=cert,
     key=key,
-    target_nip="5421234567",
-    identifier_type=SubjectIdentifierType.certificateSubject
+    context_id=ContextIdentifier(type=ContextIdentifierType.nip, value="5421234567"),
+    subject_id_type=SubjectIdentifierType.certificateSubject
 )
 
 print(res)
