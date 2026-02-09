@@ -1,5 +1,3 @@
-from pyksef.auth.identifier import ContextIdentifier
-
 # Python KSeF Authentication Library (for PKCS#11 and local private keys)
 
 > [!NOTE]  
