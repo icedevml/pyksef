@@ -1,3 +1,4 @@
+import json
 import time
 
 import requests
@@ -12,7 +13,8 @@ class KSEFAuthFailError(RuntimeError):
 
     def __init__(self, auth_state):
         status_code = auth_state["status"]["code"]
-        super(f"Authentication failed with status code: {status_code}")
+        auth_state_str = json.dumps(auth_state)
+        super(KSEFAuthFailError, self).__init__(f"Authentication failed with status code: {status_code}: {auth_state_str}")
         self.auth_state = auth_state
 
 
