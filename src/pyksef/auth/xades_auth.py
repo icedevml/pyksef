@@ -13,8 +13,11 @@ from pyksef.p11._privkey import P11ECPrivateKey, P11RSAPrivateKey
 
 def _build_xml(challenge: str, context_id: ContextIdentifier,
                subject_id_type: SubjectIdentifierType) -> etree.ElementTree:
+    root_ns = ('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+               'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
+               'xmlns="http://ksef.mf.gov.pl/auth/token/2.0"')
     data = f"""<?xml version="1.0" encoding="utf-8"?>
-    <AuthTokenRequest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://ksef.mf.gov.pl/auth/token/2.0">
+    <AuthTokenRequest {root_ns}>
         <Challenge>{challenge}</Challenge>
         <ContextIdentifier>
             {context_id.serialize()}

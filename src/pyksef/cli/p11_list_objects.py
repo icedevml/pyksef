@@ -36,9 +36,12 @@ def cli():
     parser.add_argument("--token-label", help="Token's label.")
     parser.add_argument("--token-serial", help="Token's serial number (hex).")
     parser.add_argument("--user-pin",
-                        help="Optional: User PIN to login to the token. You will be interactively prompted for PIN if this argument is not provided.")
+                        help="Optional: User PIN to login to the token. You will be interactively prompted "
+                             "for PIN if this argument is not provided.")
     parser.add_argument("--output", choices=["list", "certificates"], default="list",
-                        help="Output type. For 'list' will output a list of certificates and private keys available with certain PKCS#11 token. For 'certificates' it will dump all available certificates in the PEM format.")
+                        help="Output type. For 'list' will output a list of certificates and private keys available "
+                             "with certain PKCS#11 token. For 'certificates' it will dump all available certificates "
+                             "in the PEM format.")
     args = parser.parse_args()
 
     token_serial = None

@@ -42,7 +42,8 @@ def cli():
                         help="Optional: 'nip' (default), 'nipVatUe', or 'internalId'.")
     parser.add_argument("--context-id", required=True, help="Context identifier to authenticate against.")
     parser.add_argument("--subject-id-type", default="certificateSubject",
-                        help="Optional: Subject identifier type: 'certificateSubject' (default) or 'certificateFingerprint'.")
+                        help="Optional: Subject identifier type: 'certificateSubject' (default) "
+                             "or 'certificateFingerprint'.")
     args = parser.parse_args()
 
     context_id = ContextIdentifier(

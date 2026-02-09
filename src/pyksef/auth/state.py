@@ -14,7 +14,8 @@ class KSEFAuthFailError(RuntimeError):
     def __init__(self, auth_state):
         status_code = auth_state["status"]["code"]
         auth_state_str = json.dumps(auth_state)
-        super(KSEFAuthFailError, self).__init__(f"Authentication failed with status code: {status_code}: {auth_state_str}")
+        super(KSEFAuthFailError, self).__init__(
+            f"Authentication failed with status code: {status_code}: {auth_state_str}")
         self.auth_state = auth_state
 
 
@@ -38,8 +39,8 @@ def ksef_poll_auth_finalized(
         api_base_url: str,
         reference_number: str,
         authentication_token: str,
-        poll_interval: float=1.0,
-        timeout: float=120.0) -> dict:
+        poll_interval: float = 1.0,
+        timeout: float = 120.0) -> dict:
     if poll_interval < 0.1:
         raise ValueError("Poll interval is smaller than 0.1s")
 

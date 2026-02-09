@@ -1,9 +1,12 @@
 # Python KSeF Authentication Library (for PKCS#11 and local private keys)
 
-> [!NOTE]  
-> PL: Biblioteka do języka Python obsługująca logowanie do KSeF z użyciem dowolnego klucza prywatnego obsługującego interfejs PKCS#11 – kwalifikowane podpisy i pieczęci elektroniczne (na karcie, tokenie USB lub w formie HSM), a także certyfikaty wydane przez KSeF, do których klucze prywatne przechowywane są na HSMie (np. YubiHSM, YubiKey, Google Cloud KMS). Obsługuje również klasyczne uwierzytelnianie kluczem przechowywanym lokalnie na dysku twardym w pliku `.key` (format PEM).
+## (PL) Opis
 
-Supported features:
+Biblioteka do Pythona implementująca logowanie do Krajowego Systemu e-Faktur (KSeF) z użyciem dowolnego klucza prywatnego obsługującego interfejs PKCS#11.
+Obsługuje kwalifikowane podpisy i pieczęci elektroniczne w dowolnej postaci (na karcie, tokenie USB lub w formie HSM), a także certyfikaty wydane przez KSeF, do których klucze prywatne przechowywane są na HSMie (np. YubiHSM, YubiKey, Google Cloud KMS). Biblioteka wspiera  również klasyczne uwierzytelnianie kluczem przechowywanym lokalnie na dysku twardym w pliku `.key` (format PEM).
+
+
+## Supported features
 
 * Authentication using private keys available through PKCS#11 interface:
   * Qualified signature or qualified seal issued on a physical device,
@@ -293,10 +296,12 @@ ksef_auth_file \
 
 ## Troubleshooting
 
-If you see the following exception even though the DLL physically exists at the path indicated:
+In case if you see the following exception even though the DLL physically exists at the path indicated:
 
 ```
 pkcs11.exceptions.PKCS11Error: OS exception while loading <file path>.dll: The specified module could not be found.
 ```
 
-please check if your `PATH` environment variable is set correctly. Your PKCS#11 DLL might depend on some auxiliary DLLs that are unavailable.
+Please check if your `PATH` environment variable is set correctly. The error is actually due to the fact that your PKCS#11 DLL tries to load other DLLs that couldn't be located within the `PATH`.
+
+If your PKCS#11 library comes with other required DLL files that are all hosted within the same directory, it is going to help when you add the directory of your PKCS#11 library to `PATH` environment variable.
