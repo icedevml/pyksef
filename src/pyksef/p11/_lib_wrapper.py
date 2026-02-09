@@ -13,7 +13,7 @@ class PKCS11Lib:
         self.user_pin = None
         self.key_specifier = None
 
-    def set_token(self, *, token_label: str | None=None, token_serial: bytes | None=None, user_pin: str):
+    def set_token(self, *, token_label: str | None = None, token_serial: bytes | None = None, user_pin: str):
         token_specifier = {}
 
         if token_label:
@@ -28,7 +28,7 @@ class PKCS11Lib:
         self.token_specifier = token_specifier
         self.user_pin = user_pin
 
-    def set_private_key(self, *, key_label: str | None=None, key_id: bytes | None=None):
+    def set_private_key(self, *, key_label: str | None = None, key_id: bytes | None = None):
         key_specifier = {}
 
         if key_label:
@@ -43,7 +43,9 @@ class PKCS11Lib:
         self.key_specifier = key_specifier
 
     def get_tokens(self):
-        TokenRecord = namedtuple('TokenRecord', ['slot', 'label', 'serial', 'manufacturer_id', 'model', 'hardware_version', 'firmware_version', 'flags'])
+        TokenRecord = namedtuple('TokenRecord',
+                                 ['slot', 'label', 'serial', 'manufacturer_id', 'model', 'hardware_version',
+                                  'firmware_version', 'flags'])
 
         for token in self._lib.get_tokens():
             yield TokenRecord(
@@ -77,7 +79,7 @@ class PKCS11Lib:
     def is_configured(self):
         return self.token_specifier and self.key_specifier
 
-    def sign(self, data: bytes, *, mechanism: Mechanism | None=None, encode_sig: bool):
+    def sign(self, data: bytes, *, mechanism: Mechanism | None = None, encode_sig: bool):
         token = self._lib.get_token(**self.token_specifier)
 
         session = token.open(user_pin=self.user_pin)

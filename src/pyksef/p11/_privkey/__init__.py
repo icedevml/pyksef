@@ -1,9 +1,9 @@
 from cryptography.hazmat.primitives.asymmetric import ec, padding
 from cryptography.x509 import Certificate
 
+from pyksef.p11._lib_wrapper import PKCS11Lib
 from pyksef.p11._privkey.key_ec import P11ECPrivateKey
 from pyksef.p11._privkey.key_rsa import P11RSAPrivateKey
-from pyksef.p11._lib_wrapper import PKCS11Lib
 
 
 def create_p11_private_key(p11_lib: PKCS11Lib, x509_cert: Certificate) -> P11ECPrivateKey | P11RSAPrivateKey:

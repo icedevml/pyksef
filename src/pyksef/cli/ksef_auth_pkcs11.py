@@ -3,7 +3,8 @@ import binascii
 import getpass
 import json
 
-from pyksef import ksef_auth_xades, SubjectIdentifierType
+from pyksef import ksef_auth_xades
+from pyksef.auth.identifier import ContextIdentifier, ContextIdentifierType, SubjectIdentifierType
 from pyksef.p11 import create_p11_private_key, PKCS11Lib, get_leaf_certificate
 from pyksef.x509 import Certificate, load_pem_x509_certificate
 
@@ -18,7 +19,8 @@ def ksef_auth_pkcs11(
         key_label: str | None,
         cert: Certificate | None,
         api_base_url: str,
-        target_nip: str):
+        context_id: ContextIdentifier,
+        subject_id_type: SubjectIdentifierType):
     lib = PKCS11Lib(pkcs11_dll)
     lib.set_token(token_label=token_label, token_serial=token_serial, user_pin=user_pin)
     lib.set_private_key(key_id=key_id, key_label=key_label)
@@ -31,8 +33,8 @@ def ksef_auth_pkcs11(
         api_base_url=api_base_url,
         cert=cert,
         key=create_p11_private_key(lib, cert),
-        target_nip=target_nip,
-        identifier_type=SubjectIdentifierType.certificateSubject
+        context_id=context_id,
+        subject_id_type=subject_id_type,
     )
 
     print(json.dumps(res))
@@ -46,11 +48,23 @@ def cli():
     parser.add_argument("--token-serial", help="Token's serial number (hex).")
     parser.add_argument("--key-id", help="Private key ID (hex).")
     parser.add_argument("--key-label", help="Private key label.")
-    parser.add_argument("--user-pin", help="Optional: User PIN to login to the token. You will be interactively prompted for PIN if this argument is not provided.")
-    parser.add_argument("--cert-file", help="Optional: File path for X.509 PEM Certificate file. If not provided, we will try to load it from the token (device) itself.")
-    parser.add_argument("--api-base-url", default="https://api.ksef.mf.gov.pl/v2", help="Optional: KSeF API base url. Default: https://api.ksef.mf.gov.pl/v2")
-    parser.add_argument("--target-nip", required=True, help="Target NIP (Tax ID) to authenticate against.")
+    parser.add_argument("--user-pin",
+                        help="Optional: User PIN to login to the token. You will be interactively prompted for PIN if this argument is not provided.")
+    parser.add_argument("--cert-file",
+                        help="Optional: File path for X.509 PEM Certificate file. If not provided, we will try to load it from the token (device) itself.")
+    parser.add_argument("--api-base-url", default="https://api.ksef.mf.gov.pl/v2",
+                        help="Optional: KSeF API base url. Default: https://api.ksef.mf.gov.pl/v2")
+    parser.add_argument("--context-id-type", default="nip",
+                        help="Optional: 'nip' (default), 'nipVatUe', or 'internalId'.")
+    parser.add_argument("--context-id", required=True, help="Context identifier to authenticate against.")
+    parser.add_argument("--subject-id-type", default="certificateSubject",
+                        help="Optional: Subject identifier type: 'certificateSubject' (default) or 'certificateFingerprint'.")
     args = parser.parse_args()
+
+    context_id = ContextIdentifier(
+        type=ContextIdentifierType[args.context_id_type],
+        value=args.context_id
+    )
 
     token_serial = None
     key_id = None
@@ -80,7 +94,8 @@ def cli():
         user_pin=user_pin,
         cert=cert,
         api_base_url=args.api_base_url,
-        target_nip=args.target_nip
+        context_id=context_id,
+        subject_id_type=args.subject_id_type
     )
 
 
