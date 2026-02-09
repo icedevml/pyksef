@@ -1,5 +1,8 @@
 # Python KSeF XAdES Authentication
 
+> [!NOTE]  
+> PL: Biblioteka do języka Python obsługująca logowanie do KSeF z użyciem dowolnego klucza prywatnego obsługującego interfejs PKCS#11 – kwalifikowane podpisy i pieczęci elektroniczne (na karcie, tokenie USB lub w formie HSM), a także certyfikaty wydane przez KSeF, do których klucze prywatne przechowywane są na HSMie (np. YubiHSM, YubiKey, Google Cloud KMS). Obsługuje również klasyczne uwierzytelnianie kluczem przechowywanym lokalnie na dysku twardym w pliku `.key` (format PEM).
+
 Supported features:
 
 * Authentication using private keys available through PKCS#11 interface:
