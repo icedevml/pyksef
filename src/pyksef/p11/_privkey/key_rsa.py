@@ -30,7 +30,7 @@ class P11RSAPrivateKey(rsa.RSAPrivateKey):
 
         if not self.p11_lib.is_configured():
             raise RuntimeError("The passed p11_lib is not configured. "
-                               "Use p11_lib.set_token() and p11_lib.set_key() first.")
+                               "Use p11_lib.set_token() and p11_lib.set_private_key() first.")
 
     def sign(self, data: bytes, padding: AsymmetricPadding, algorithm: typing.Union[asym_utils.Prehashed, hashes.HashAlgorithm]) -> bytes:
         if not isinstance(padding, PKCS1v15):

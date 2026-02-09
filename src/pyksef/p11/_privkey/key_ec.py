@@ -26,7 +26,7 @@ class P11ECPrivateKey(ec.EllipticCurvePrivateKey):
 
         if not self.p11_lib.is_configured():
             raise RuntimeError("The passed p11_lib is not configured. "
-                               "Use p11_lib.set_token() and p11_lib.set_key() first.")
+                               "Use p11_lib.set_token() and p11_lib.set_private_key() first.")
 
     def sign(self, data: utils.Buffer, signature_algorithm: EllipticCurveSignatureAlgorithm) -> bytes:
         mechanism = map_p11_mechanism(self.x509_cert)
