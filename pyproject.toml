@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyksef"
-version = "0.3.2"
+version = "0.3.3"
 description = "KSeF Authentication library"
 readme = "README.md"
 authors = [
@@ -36,9 +36,9 @@ p11_list_objects = "pyksef.cli.p11_list_objects:cli"
 p11_list_tokens = "pyksef.cli.p11_list_tokens:cli"
 
 [project.urls]
-Homepage = "https://github.com/icedevml/python-ksef-xades-auth"
-Repository = "https://github.com/icedevml/python-ksef-xades-auth"
-Issues = "https://github.com/icedevml/python-ksef-xades-auth/issues"
+Homepage = "https://github.com/icedevml/pyksef"
+Repository = "https://github.com/icedevml/pyksef"
+Issues = "https://github.com/icedevml/pyksef/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
