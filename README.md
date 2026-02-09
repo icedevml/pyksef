@@ -10,6 +10,10 @@ Supported features:
   * KSeF Certificate hosted on a HSM (e.g. YubiHSM, YubiKey, Google Cloud KMS).
 * Authentication using certificate and private key stored as PEM files on local hard disk.
 
+## Installation
+
+Library available on PyPi: [pyksef](https://pypi.org/project/pyksef/)
+
 ```commandline
 pip3 install pyksef
 ```
